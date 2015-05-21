@@ -1,1 +1,1 @@
-Asteroids clone made with Platino
+Space Invaders clone made with Platino
