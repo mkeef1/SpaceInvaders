@@ -6,15 +6,47 @@
 		
 		var left = null,
 			player = null,
-			right = null;
-			fire = null;
+			right = null,
+			fire = null,			
+			bulletIndex = 0,
 			MAX_BULLETS = 10;
 			
 		var transform = platino.createTransform();
 		
 		var bullets = new Array(MAX_BULLETS);
+		var bulletMover = new Array(MAX_BULLETS);
 		
 		transform.duration = 2000;
+		
+		
+		function makeBullets() {
+			for (var i = 0; i < MAX_BULLETS; i++) {
+				bullets[i] = platino.createSprite({width: 10, height: 10});
+				bullets[i].hide();
+				bullets[i].ready = true;
+					
+				bulletMover[i] = platino.createTransform();
+				bulletMover[i].index = i;
+					
+				bulletMover[i].addEventListener('complete', bulletsCompleted);
+				scene.add(bullets[i]);
+			}
+		}
+		
+		var bulletsCompleted = function(e) {
+			bullets[e.source.index].hide();
+			bullets[e.source.index].ready = true;
+		};
+			
+		function getInitialBulletYPosition() {
+    		return player.y - (bullets[0].height);
+		}
+
+		function getInitialBulletXPosition(){
+    		return player.x + (player.width * 0.5) - (bullets[0].width * 0.5);
+		}
+		
+		var lastTimeBulletFired = 0;
 		
 		// Report touch events here
 		var onSpriteTouch = function(e) {
@@ -39,11 +71,24 @@
 			}
 		};
 		
-		var onFireTouch = function(e) {
-			if(e.type == 'touchstart') {
-				transform.y = 0;
-				bullets[0].transform(transform);
-				bullets[0].show();
+		var onFireTouch = function() {
+			if(+new Date() - lastTimeBulletFired > 200 && bullets[bulletIndex].ready) {
+				bullets[bulletIndex].clearTransform(bulletMover[bulletIndex]);
+				bullets[bulletIndex].x = getInitialBulletXPosition();
+				bullets[bulletIndex].y = getInitialBulletYPosition();
+				bullets[bulletIndex].ready = false;
+				bullets[bulletIndex].show();
+				bulletMover[bulletIndex].x = getInitialBulletXPosition();
+				bulletMover[bulletIndex].y = -bullets[bulletIndex].height;
+				bulletMover[bulletIndex].duration = (bullets[bulletIndex].y + bullets[bulletIndex].height) / 150 * 1000;
+				bullets[bulletIndex].transform(bulletMover[bulletIndex]);
+				
+				bulletIndex++;
+				if(bulletIndex >= MAX_BULLETS) {
+					bulletIndex = 0;
+				}
+				
+				lastTimeBulletFired = +new Date();
 			}
 		};
 		
@@ -74,20 +119,20 @@
 				width: 50, height: 50, x: game.TARGET_SCREEN.width, y: game.TARGET_SCREEN.height - 128
 			});
 			right.color(0, 0, 1.0);
-			right.name = 'right';
+			right.name = 'right';	
 			
-			function makeBullets() {
-				for (var i; i < MAX_BULLETS; i++) {
-					bullets[i] = platino.createSprite({width: 10, height: 10, x: (player.x / 2) - 5, y: (player.y / 2) - 5});
-					bullets[i].hide();
-					scene.add(bullets[i]);
-				}
-			}
+			
+			
+			
+
+			
 			
 			scene.add(left);
 			scene.add(player);
 			scene.add(right);
 			scene.add(fire);
+			lastTimeBulletFired = +new Date();
+			makeBullets();
 			
 			// add touch events to sprites
 			left.addEventListener('touchstart', onLeftTouch);
@@ -95,7 +140,7 @@
 			right.addEventListener('touchstart', onRightTouch);
 			right.addEventListener('touchend', onRightTouch);
 			fire.addEventListener('touchstart', onFireTouch);
-			fire.addEventListener('touchend', onFireTouch);
+			// fire.addEventListener('touchend', onFireTouch);
 		};
 
 		var onSceneDeactivated = function(e) {
