@@ -15,21 +15,20 @@
 			
 			
 		var transform = platino.createTransform();
-		
-		var bullets = new Array(MAX_BULLETS);
-		var bulletMover = new Array(MAX_BULLETS);
-		
 		transform.duration = 2000;
 		
-		var enemies = new Array(MAX_ENEMIES);
-		var enemyMover = new Array(MAX_ENEMIES);
-		var enemyMover2 = new Array(MAX_ENEMIES);
+		var bullets = new Array(MAX_BULLETS),
+			bulletMover = new Array(MAX_BULLETS),
+			enemies = new Array(MAX_ENEMIES),
+			enemyMover = new Array(MAX_ENEMIES),
+			enemyMover2 = new Array(MAX_ENEMIES);
 		
 		function makeEnemies(){
 			for (var i = 0; i < MAX_ENEMIES; i++) {
 				var x = 70 + (i % 8) * 30;
 				var y = 30 + (i % 3) * 30;
 				enemies[i] = platino.createSprite({width: 20, height: 20, x: x, y: y});
+				enemies[i].color(0, 1.0, 0);
 				
 				enemies[i].ready = true;
 				
@@ -103,9 +102,6 @@
 		var lastTimeBulletFired = 0;
 		
 		// Report touch events here
-		var onSpriteTouch = function(e) {
-			Ti.API.info(e.source.name + ' fiplayer a touch event with type: ' + e.type);
-		};
 		
 		var onLeftTouch = function(e) {
 			if(e.type == 'touchstart') {
@@ -149,10 +145,6 @@
 		var onSceneActivated = function(e) {
 			// ---- create sprites, add listeners, etc. ----
 
-			Ti.API.info("MainScene has been activated.");
-			
-			
-			
 			fire = platino.createSprite({
 				width: game.TARGET_SCREEN.width - 100, height: 35, x: game.TARGET_SCREEN.width / 4, y: game.TARGET_SCREEN.height - 128
 			});
@@ -161,19 +153,16 @@
 				width: 35, height: 35, x: 10, y: game.TARGET_SCREEN.height - 128
 			});
 			left.color(0, 0, 1.0);
-			left.name = 'Left';
 			
 			player = platino.createSprite({
 				width: 35, height: 35, x: game.TARGET_SCREEN.width / 2, y: game.TARGET_SCREEN.height - 64
 			});
 			player.color(1.0, 0, 0);
-			player.name = 'player';
 
 			right = platino.createSprite({
 				width: 35, height: 35, x: game.TARGET_SCREEN.width, y: game.TARGET_SCREEN.height - 128
 			});
 			right.color(0, 0, 1.0);
-			right.name = 'right';	
 			
 			scene.add(left);
 			scene.add(player);
@@ -195,8 +184,6 @@
 		var onSceneDeactivated = function(e) {
 
 			// ---- remove sprites, listeners, etc. ----
-
-			Ti.API.info("MainScene has been deactivated.");
 			
 			if (left) {
 				scene.remove(left);
@@ -207,8 +194,6 @@
 
 			if (player) {
 				scene.remove(player);
-				player.removeEventListener('touchstart', onSpriteTouch);
-				player.removeEventListener('touchend', onSpriteTouch);
 				player = null;
 			}
 
@@ -221,8 +206,8 @@
 
 			if (fire) {
 				scene.remove(fire);
-				fire.removeEventListener('touchstart', onSpriteTouch);
-				fire.removeEventListener('touchend', onSpriteTouch);
+				fire.removeEventListener('touchstart', onFireTouch);
+				fire.removeEventListener('touchend', onFireTouch);
 				fire = null;
 			}
 
