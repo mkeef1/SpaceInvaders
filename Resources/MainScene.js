@@ -9,7 +9,11 @@
 			right = null,
 			fire = null,			
 			bulletIndex = 0,
-			MAX_BULLETS = 10;
+			MAX_BULLETS = 10,
+			MAX_ENEMIES = 30;
+			ENEMY_ROW = 5;
+			ENEMY_COLUMN = 6;
+			
 			
 		var transform = platino.createTransform();
 		
@@ -18,6 +22,21 @@
 		
 		transform.duration = 2000;
 		
+		var enemies = new Array(MAX_ENEMIES);
+		var enemyMover = new Array(MAX_ENEMIES);
+		
+		function makeEnemies(){
+			for (var i = 0; i < MAX_ENEMIES; i++) {
+				var x = 70 + (i % 8) * 30;
+				var y = 30 + (i % 3) * 30;
+				enemies[i] = platino.createSprite({width: 20, height: 20, x: x, y: y});
+				
+				enemies[i].ready = true;
+				
+				// enemyMover[i] = platino.createTransform();
+				scene.add(enemies[i]);
+			}
+		}
 		
 		function makeBullets() {
 			for (var i = 0; i < MAX_BULLETS; i++) {
@@ -100,23 +119,23 @@
 			
 			
 			fire = platino.createSprite({
-				width: game.TARGET_SCREEN.width - 100, height: 50, x: game.TARGET_SCREEN.width / 4, y: game.TARGET_SCREEN.height - 128
+				width: game.TARGET_SCREEN.width - 100, height: 35, x: game.TARGET_SCREEN.width / 4, y: game.TARGET_SCREEN.height - 128
 			});
 			
 			left = platino.createSprite({
-				width: 50, height: 50, x: 10, y: game.TARGET_SCREEN.height - 128
+				width: 35, height: 35, x: 10, y: game.TARGET_SCREEN.height - 128
 			});
 			left.color(0, 0, 1.0);
 			left.name = 'Left';
 			
 			player = platino.createSprite({
-				width: 50, height: 50, x: game.TARGET_SCREEN.width / 2, y: game.TARGET_SCREEN.height - 64
+				width: 35, height: 35, x: game.TARGET_SCREEN.width / 2, y: game.TARGET_SCREEN.height - 64
 			});
 			player.color(1.0, 0, 0);
 			player.name = 'player';
 
 			right = platino.createSprite({
-				width: 50, height: 50, x: game.TARGET_SCREEN.width, y: game.TARGET_SCREEN.height - 128
+				width: 35, height: 35, x: game.TARGET_SCREEN.width, y: game.TARGET_SCREEN.height - 128
 			});
 			right.color(0, 0, 1.0);
 			right.name = 'right';	
@@ -133,6 +152,7 @@
 			scene.add(fire);
 			lastTimeBulletFired = +new Date();
 			makeBullets();
+			makeEnemies();
 			
 			// add touch events to sprites
 			left.addEventListener('touchstart', onLeftTouch);
