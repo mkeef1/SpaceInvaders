@@ -10,9 +10,8 @@
 			fire = null,			
 			bulletIndex = 0,
 			MAX_BULLETS = 10,
-			MAX_ENEMIES = 30;
-			ENEMY_ROW = 5;
-			ENEMY_COLUMN = 6;
+			MAX_ENEMIES = 30,
+			updateTimerID = 0;
 			
 			
 		var transform = platino.createTransform();
@@ -24,6 +23,7 @@
 		
 		var enemies = new Array(MAX_ENEMIES);
 		var enemyMover = new Array(MAX_ENEMIES);
+		var enemyMover2 = new Array(MAX_ENEMIES);
 		
 		function makeEnemies(){
 			for (var i = 0; i < MAX_ENEMIES; i++) {
@@ -33,10 +33,45 @@
 				
 				enemies[i].ready = true;
 				
-				// enemyMover[i] = platino.createTransform();
+				enemyMover[i] = platino.createTransform();
+				enemyMover2[i] = platino.createTransform();
+				enemyMover[i].index = i;
+				enemyMover2[i].index = i;
+				
+				enemyMover[i].x = enemies[i].x + 60;
+				enemyMover[i].duration = 5000;
+				enemyMover[i].autoreverse = true;
+				enemyMover[i].repeat = -1;
+				
+				enemyMover2[i].y = enemies[i].y + 40;
+				enemyMover2[i].delay = 5000;
+				enemyMover2[i].repeat = 2;
+				
 				scene.add(enemies[i]);
+				enemies[i].transform(enemyMover[i]);
+				enemies[i].transform(enemyMover2[i]);
 			}
 		}
+		
+		function createUpdateTimer(){
+			updateTimerID = setInterval(function(e){
+				checkCollision();
+			}, 500);
+		}
+		
+		function checkCollision(){
+			for (var i = 0; i < MAX_ENEMIES; i++) {
+				for (var j = 0; j < MAX_BULLETS; j++) {
+					if (enemies[i].collidesWith(bullets[j])) {
+						enemies[i].hide();
+						enemies[i].clearTransforms();
+						bullets[j].hide();
+						bullets[j].clearTransforms();
+					}
+				}
+			}
+		}
+		
 		
 		function makeBullets() {
 			for (var i = 0; i < MAX_BULLETS; i++) {
@@ -140,12 +175,6 @@
 			right.color(0, 0, 1.0);
 			right.name = 'right';	
 			
-			
-			
-			
-
-			
-			
 			scene.add(left);
 			scene.add(player);
 			scene.add(right);
@@ -153,7 +182,7 @@
 			lastTimeBulletFired = +new Date();
 			makeBullets();
 			makeEnemies();
-			
+			createUpdateTimer();
 			// add touch events to sprites
 			left.addEventListener('touchstart', onLeftTouch);
 			left.addEventListener('touchend', onLeftTouch);
