@@ -10,7 +10,7 @@
 			fire = null,			
 			bulletIndex = 0,
 			MAX_BULLETS = 10,
-			MAX_ENEMIES = 30,
+			MAX_ENEMIES = 24,
 			updateTimerID = 0;
 			
 			
@@ -23,7 +23,7 @@
 			enemyMover = new Array(MAX_ENEMIES),
 			enemyMover2 = new Array(MAX_ENEMIES);
 		
-		function makeEnemies(){
+		function makeEnemies() {
 			for (var i = 0; i < MAX_ENEMIES; i++) {
 				var x = 70 + (i % 8) * 30;
 				var y = 30 + (i % 3) * 30;
@@ -44,7 +44,7 @@
 				
 				enemyMover2[i].y = enemies[i].y + 40;
 				enemyMover2[i].delay = 5000;
-				enemyMover2[i].repeat = 2;
+				enemyMover2[i].repeat = -1;
 				
 				scene.add(enemies[i]);
 				enemies[i].transform(enemyMover[i]);
@@ -52,20 +52,20 @@
 			}
 		}
 		
-		function createUpdateTimer(){
-			updateTimerID = setInterval(function(e){
+		function createUpdateTimer() {
+			updateTimerID = setInterval(function(e) {
 				checkCollision();
-			}, 500);
+			}, 100);
 		}
 		
-		function checkCollision(){
+		function checkCollision() {
 			for (var i = 0; i < MAX_ENEMIES; i++) {
 				for (var j = 0; j < MAX_BULLETS; j++) {
 					if (enemies[i].collidesWith(bullets[j])) {
 						enemies[i].hide();
-						enemies[i].clearTransforms();
+						enemies[i].ready = false;
 						bullets[j].hide();
-						bullets[j].clearTransforms();
+						bullets[j].ready = false;
 					}
 				}
 			}
@@ -95,7 +95,7 @@
     		return player.y - (bullets[0].height);
 		}
 
-		function getInitialBulletXPosition(){
+		function getInitialBulletXPosition() {
     		return player.x + (player.width * 0.5) - (bullets[0].width * 0.5);
 		}
 		
